@@ -1,0 +1,57 @@
+{% extends 'bom/bom-base.html' %}
+
+{% load static %}
+{% load djmoney %}
+
+{% block head-title %}{{ part.full_part_number }}{% if part_revision %} {{ part_revision.synopsis }}{% endif %}{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{% static 'bom/css/style.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'bom/css/warehouse-info.css' %}"/>
+{% endblock %}
+
+{% block content %}
+    <div class="container-app">
+        <div class="warehouse-info">
+            <div class="row" style="margin-bottom: 5px;">
+                <div class="col m8 hide-on-small-and-down">
+                    <h3 class="light">{{ warehouse.name }}</h3>
+                </div>
+            </div>
+
+
+            <div class="responsive-table-wrapper">
+                <table class="highlist inventory-list tight single-line" style="margin-bottom: 14px;">
+                    <thead>
+                        <tr>
+                            <th class="text-normal td-large">Part</th>
+                            <th class="text-normal td-small">Rev.</th>
+                            <th class="text-normal td-med">Quantity</th>
+                            <th class="text-normal td-med">Avg unit price</th>
+                            <th class="text-normal td-med">Total price</th>
+                            <th class="text-normal td-med">Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for part in inventory %}
+                        <tr>
+                            <td class="text-normal td-large"><a href="{% url 'bom:part-info' part_id=part.part_revision.id %}">{{ part.part_revision.part }}</a></td>
+                            <td class="text-normal td-small">{{ part.part_revision.revision }}</td>
+                            <td class="text-normal td-med">{{ part.stock_quantity }}</td>
+                            <td class="text-normal td-med">{{ part.unit_cost }}</td>
+                            <td class="text-normal td-med">{{ part.total|floatformat:2 }}</td>
+                            <td class="text-normal td-med"></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="99" style="text-align: center; padding: 5%;">
+                                <i>No parts found in this warehouse</i>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

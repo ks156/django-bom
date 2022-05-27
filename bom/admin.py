@@ -128,6 +128,9 @@ class AssemblyAdmin(admin.ModelAdmin):
 class WarehouseAdmin(admin.ModelAdmin):
     list_display = ('name', 'location',)
 
+class InventoryAdmin(admin.ModelAdmin):
+    list_display = ('part_revision', 'stock_quantity', 'unit_cost',)
+
 
 admin.site.unregister(User)
 
@@ -143,3 +146,4 @@ admin.site.register(Manufacturer, ManufacturerAdmin)
 admin.site.register(Assembly, AssemblyAdmin)
 admin.site.register(Subpart, SubpartAdmin)
 admin.site.register(Warehouse, WarehouseAdmin)
+admin.site.register(Inventory, InventoryAdmin)

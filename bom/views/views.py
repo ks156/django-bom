@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.utils.encoding import smart_str
 from django.utils.text import smart_split
 from django.views.generic.base import TemplateView
+from django.db.models import F
 
 from social_django.models import UserSocialAuth
 
@@ -75,6 +76,7 @@ from bom.models import (
     User,
     UserMeta,
     Warehouse,
+    Inventory,
 )
 from bom.utils import check_references_for_duplicates, listify_string, prep_for_sorting_nicely, stringify_list
 
@@ -1555,3 +1557,12 @@ def warehouse_delete(request, warehouse_id):
     warehouse.delete()
 
     return HttpResponseRedirect(reverse('bom:warehouses'))
+
+@login_required
+def warehouse_info(request, warehouse_id):
+    user = request.user
+    profile = user.bom_profile()
+    organization = profile.organization
+    warehouse = Warehouse.objects.get(id=warehouse_id)
+    inventory = Inventory.objects.filter(warehouse=warehouse_id).annotate(total=F('unit_cost') * F('stock_quantity')).order_by('part_revision__part')
+    return TemplateResponse(request, 'bom/warehouse-info.html', locals())

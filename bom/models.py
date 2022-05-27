@@ -746,3 +746,10 @@ class Warehouse(models.Model, AsDictModel):
 
     def __str__(self):
         return u'%s' % (self.name)
+
+class Inventory(models.Model, AsDictModel):
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE, db_index=True)
+    part_revision = models.ForeignKey(PartRevision, on_delete=models.CASCADE, db_index=True)
+    stock_quantity = models.IntegerField(default=0)
+    unit_cost = MoneyField(max_digits=19, decimal_places=4, default_currency='USD')
+

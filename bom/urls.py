@@ -20,6 +20,7 @@ bom_patterns = [
     path('warehouse-create/', views.warehouse_create, name='warehouse-create'),
     path('warehouse/<int:warehouse_id>/edit/', views.warehouse_edit, name='warehouse-edit'),
     path('warehouse/<int:warehouse_id>/delete/', views.warehouse_delete, name='warehouse-delete'),
+    path('warehouse/<int:warehouse_id>/info/', views.warehouse_info, name='warehouse-info'),
     path('export/', views.export_part_list, name='export-part-list'),
     path('user-meta/<int:user_meta_id>/edit/', views.user_meta_edit, name='user-meta-edit'),
     path('part-class/<int:part_class_id>/edit/', views.part_class_edit, name='part-class-edit'),
