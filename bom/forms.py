@@ -63,6 +63,7 @@ from .models import (
     Subpart,
     User,
     UserMeta,
+    Warehouse,
 )
 from .utils import (
     check_references_for_duplicates,
@@ -1343,3 +1344,19 @@ class BOMCSVForm(forms.Form):
 
 class FileForm(forms.Form):
     file = forms.FileField()
+
+class WarehouseForm(forms.ModelForm):
+    class Meta:
+        model = Warehouse
+        exclude = ['organization', ]
+        help_texts = {
+            'number_item': _('Enter a warehouse name.'),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.organization = kwargs.pop('organization', None)
+        super(WarehouseForm, self).__init__(*args, **kwargs)
+        self.fields['name'].required = True
+        for _, value in self.fields.items():
+            value.widget.attrs['placeholder'] = value.help_text
+            value.help_text = ''

@@ -59,6 +59,7 @@ from bom.forms import (
     UserCreateForm,
     UserForm,
     UserMetaForm,
+    WarehouseForm,
 )
 from bom.models import (
     Assembly,
@@ -73,6 +74,7 @@ from bom.models import (
     Subpart,
     User,
     UserMeta,
+    Warehouse,
 )
 from bom.utils import check_references_for_duplicates, listify_string, prep_for_sorting_nicely, stringify_list
 
@@ -1477,3 +1479,79 @@ class Help(TemplateView):
         context = super(Help, self).get_context_data(**kwargs)
         context['name'] = self.name
         return context
+
+@login_required
+def warehouses(request):
+    profile = request.user.bom_profile()
+    organization = profile.organization
+    if not organization:
+        return HttpResponseRedirect(reverse('bom:organization-create'))
+
+    query = request.GET.get('q', '')
+    warehouses = Warehouse.objects.filter()
+
+    return TemplateResponse(request, 'bom/warehouses.html', locals())
+
+@login_required
+def warehouse_create(request):
+    user = request.user
+    profile = user.bom_profile()
+    organization = profile.organization
+
+    title = 'Create New Warehouse'
+
+    if request.method == 'POST':
+        warehouse_form = WarehouseForm(request.POST, organization=organization)
+        # Checking if part form is valid checks for number uniqueness
+        if warehouse_form.is_valid():
+            name = warehouse_form.cleaned_data['name']
+            location = warehouse_form.cleaned_data['location']
+
+            warehouse, created = Warehouse.objects.get_or_create(
+                name=name,
+                location=location,
+                organization=organization)
+
+            return HttpResponseRedirect(reverse('bom:warehouses'))
+    else:
+        # Initialize organization in the form's model and in the form itself:
+        warehouse_form = WarehouseForm(initial={'organization': organization}, organization=organization)
+
+    return TemplateResponse(request, 'bom/warehouse-create.html', locals())
+
+@login_required
+def warehouse_edit(request, warehouse_id):
+    user = request.user
+    profile = user.bom_profile()
+    organization = profile.organization
+
+    warehouse = get_object_or_404(Warehouse, pk=warehouse_id)
+    title = 'Edit Warehouse {}'.format(warehouse.name)
+
+    action = reverse('bom:warehouse-edit', kwargs={'warehouse_id': warehouse_id})
+
+    if request.method == 'POST':
+        form = WarehouseForm(request.POST, instance=warehouse, organization=organization)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('bom:warehouses'))
+    else:
+        form = WarehouseForm(instance=warehouse, organization=organization)
+
+    return TemplateResponse(request, 'bom/bom-form.html', locals())
+
+@login_required
+def warehouse_delete(request, warehouse_id):
+    user = request.user
+    profile = user.bom_profile()
+    organization = profile.organization
+
+    try:
+        warehouse = Warehouse.objects.get(id=warehouse_id)
+    except Warehouse.DoesNotExist:
+        messages.error(request, "No warehouse found with given warehouse_id {}.".format(warehouse_id))
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'), '/')
+
+    warehouse.delete()
+
+    return HttpResponseRedirect(reverse('bom:warehouses'))

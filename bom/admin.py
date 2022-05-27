@@ -125,6 +125,9 @@ class AssemblyAdmin(admin.ModelAdmin):
         SubpartsInline,
     ]
 
+class WarehouseAdmin(admin.ModelAdmin):
+    list_display = ('name', 'location',)
+
 
 admin.site.unregister(User)
 
@@ -139,3 +142,4 @@ admin.site.register(PartRevision, PartRevisionAdmin)
 admin.site.register(Manufacturer, ManufacturerAdmin)
 admin.site.register(Assembly, AssemblyAdmin)
 admin.site.register(Subpart, SubpartAdmin)
+admin.site.register(Warehouse, WarehouseAdmin)

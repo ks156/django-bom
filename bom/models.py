@@ -723,3 +723,26 @@ class SellerPart(models.Model, AsDictModel):
 
     def __str__(self):
         return u'%s' % (self.manufacturer_part.part.full_part_number() + ' ' + self.seller.name)
+
+class Warehouse(models.Model, AsDictModel):
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, db_index=True)
+    name = models.CharField(max_length=255, default=None, null=True, blank=True)
+    location = models.CharField(max_length=255, default=None, null=True, blank=True)
+
+    class Meta():
+        unique_together = [
+            'name',
+            'location']
+
+    def as_dict(self):
+        d = super().as_dict()
+        return d
+
+    def as_dict_for_export(self):
+        return {
+            'warehouse_name': self.name,
+            'warehouse_location': self.location,
+        }
+
+    def __str__(self):
+        return u'%s' % (self.name)

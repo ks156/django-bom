@@ -1,0 +1,90 @@
+{% extends 'bom/bom-base.html' %}
+
+{% load static %}
+
+{% block head-title %}Warehouses{% endblock %}
+
+{% block main %}
+    <link rel="stylesheet" type="text/css" href="{% static 'bom/css/style.css' %}"/>
+{% endblock %}
+
+{% block bom-menu %}
+{% endblock %}
+
+{% block content %}
+<div class="container-app">
+    <div class="warehouse-list push-footer">
+        <div class="responsive-table-wrapper">
+            <table class="highlight warehouse-list tight single-line" style="margin-bottom: 14px;">
+                <thead>
+                    <tr>
+                        <th class="text-normal td-large">Name</th>
+                        <th class="text-normal td-large">Location</th>
+                        <th class="text-normal td-small">Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for warehouse in warehouses %}
+                    <tr>
+                        <td class="text-normal td-large">{{ warehouse.name }}</td>
+
+                        <td class="text-normal td-large">{{ warehouse.location }}</td>
+
+                        <td class="text-normal td-small">
+                            <!-- Dropdown Trigger -->
+                            <a class="dropdown-trigger" href='#' data-target='warehouse-menu-{{ warehouse.id }}'><i class="material-icons green-text">more_horiz</i></a>
+                            <!-- Dropdown Structure -->
+                            <ul id='warehouse-menu-{{ warehouse.id }}' class='dropdown-content'>
+                                <li>
+                                    <a class="green-text text-lighten-1" href="{% url 'bom:warehouse-edit' warehouse_id=warehouse.id %}">
+                                        <i class="material-icons green-text text-lighten-1">edit</i>Edit Warehouse</a>
+                                </li>
+                                <li>
+                                    <a class="green-text text-lighten-1" href="{% url 'bom:warehouse-delete' warehouse_id=warehouse.id %}">
+                                        <i class="material-icons green-text text-lighten-1">delete</i>Delete Warehouse</a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="99" style="text-align: center; padding: 5%;"><i>No warehouse found. Click <a
+                                         href="{% url 'bom:warehouse-create' %}">here</a> to create your first warehouse</i></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if profile.role == 'A' %}
+        <div class="fixed-action-btn">
+            <a class="btn-floating btn-large red" href="{% url 'bom:warehouse-create' %}">
+                <i class="large material-icons">add</i>
+            </a>
+        </div>
+    <script>
+        $(document).ready(function () {
+                    $('.fixed-action-btn').floatingActionButton();
+                    $('.tooltipped').tooltip();
+                });
+    </script>
+    {% endif %}
+    <!-- Handle if there's an anchor, select tab -->
+    <script type='text/javascript'>
+        // For dropdown menu
+        $(document).ready(function () {
+            $('.dropdown-trigger').dropdown({
+                    inDuration: 300,
+                    outDuration: 225,
+                    constrainWidth: false, // Does not change width of dropdown to that of the activator
+                    alignment: 'left', // Displays dropdown with edge aligned to the left of button
+                    stopPropagation: false, // Stops event propagation
+                    coverTrigger: false
+                }
+            );
+
+            // For tooltips!
+            $('.tooltipped').tooltip();
+        });
+    </script>
+    {% endblock %}
